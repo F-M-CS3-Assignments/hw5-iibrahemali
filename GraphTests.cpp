@@ -182,10 +182,44 @@ void TestDestructor(){
 	cout << "NO ERRORS.  Use valgrind to check!" << endl << endl;
 }
 
+// add few more 
 
+void TestDuplicateEdges() {
+	cout << "Testing duplicate edge handling..." << endl;
+	Graph g;
+	g.AddNode(1);
+	g.AddNode(2);
+	g.AddEdge(1, 2, 5);
 
-int main(){
-	
+	try {
+		g.AddEdge(1, 2, 5);
+		assert(false); // should not reach this line
+	} catch (const invalid_argument& e) {
+		// good
+	}
+
+	cout << "PASSED!" << endl << endl;
+}
+
+void TestInvalidEdges() {
+	cout << "Testing edge to/from invalid nodes..." << endl;
+	Graph g;
+	g.AddNode(10);
+
+	try {
+		g.AddEdge(10, 99); // node 99 doesn’t exist
+		assert(false);
+	} catch (const invalid_argument& e) {}
+
+	try {
+		g.AddEdge(88, 10); // node 88 doesn’t exist
+		assert(false);
+	} catch (const invalid_argument& e) {}
+
+	cout << "PASSED!" << endl << endl;
+}
+
+int main() {
 	TestAddNode();
 	TestAddEdge();
 	TestIsPresentSizeAndOrder();
@@ -193,7 +227,10 @@ int main(){
 	TestGetNodes();
 	TestDestructor();
 
-	
+	// extra ones
+	TestDuplicateEdges();
+	TestInvalidEdges();
+
 	cout << "ALL TESTS PASSED!" << endl;
 	return 0;
 }

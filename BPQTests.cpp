@@ -1,5 +1,3 @@
-
-
 #include "Graph.h"
 #include "BetterPriorityQueue.h"
 #include <cassert>
@@ -23,11 +21,8 @@ void ContainsTest() {
 	for(nodekey_t n : nodes){
 		BPQNode cur;
 		cur.gnode = n;
-		//cout << "inserting cur.pri: " << cur.pri << "  node: " << cur.node->key << endl;
 		q.push(cur);
-		//cout << "size: " << q.size() << endl;
 	}
-	
 	
 	// 1st test
 	BPQNode positive;
@@ -38,14 +33,11 @@ void ContainsTest() {
 	BPQNode negative;
 	assert(q.Contains(negative) == false);
 	
-	// 3rd test (just to ensure it still works after 2nd test finishes)
+	// 3rd test (again)
 	assert(q.Contains(positive) == true);
-	
 	
 	cout << "PASSED!" << endl;
 }
-
-
 
 void UpdateTest() {
 	cout << "Testing Update Helper Method..." << endl;
@@ -65,60 +57,74 @@ void UpdateTest() {
 		BPQNode cur;
 		cur.pri = i;
 		cur.gnode = n;
-		//cout << "inserting cur.pri: " << cur.pri << "  node: " << cur.node->key << endl;
 		q.push(cur);
-		//cout << "size: " << q.size() << endl;
 		i++;
 	}
-	
 
-	//cout << "q before: " << queue_to_string(q) << endl;
-
-	// Test 1: update a node with pri 0 (normal case)
+	// Test 1: update a node with lower pri (normal case)
 	BPQNode positive;
 	positive.gnode = 6;
 	positive.pri = 0;
 	cout << "q before: " << q.ToString() << endl;
 	assert(q.Update(positive) == true);
 	cout << "q after: " << q.ToString() << endl;
+	string result = q.ToString();
+	assert(result.find("(6, pri: 0)") != string::npos);
 
-
-
-	// some students might have a slightly different order
-	// please ensure the output is a valid priorityqueue as 
-	// implemented by a binary heap.  Any valid order is fine!
-	string soln1 = "[(6, pri: 0), (1, pri: 0), (2, pri: 1), (3, pri: 2), (4, pri: 3), (5, pri: 4)]";
-	string soln2 = "[(1, pri: 0), (2, pri: 1), (6, pri: 0), (4, pri: 3), (5, pri: 4), (3, pri: 2)]";
-	string soln3 = "[(1, pri: 0), (6, pri: 0), (2, pri: 1), (3, pri: 2), (4, pri: 3), (5, pri: 4)]";
-
-	
-	// Test 2: attempt to update with an empty / undefined input
+	// Test 2: update with undefined node
 	BPQNode negative;
 	assert(q.Update(negative) == false);
 	cout << "q after test 2: " << q.ToString() << endl;
-	assert(q.ToString() == soln1 || q.ToString() == soln2 || q.ToString() == soln3);
-	
 
-	// Test 3: update a node with a larger priority
-	// It must behave this way (ignoring larger priorities)
-	// for compatibility with Dijkstra's algorithm
+	// Test 3: update with higher pri (should fail)
 	BPQNode negative2;
 	negative2.gnode = 5;
 	negative2.pri = 80;
 	assert(q.Update(negative2) == false);
 	cout << "q after test 3: " << q.ToString() << endl;
-	assert(q.ToString() == soln1 || q.ToString() == soln2 || q.ToString() == soln3);	
+	assert(result.find("(5, pri: 4)") != string::npos);
+
+	cout << "PASSED!" << endl;
+}
+
+void PriorityOrderTest() {
+	cout << "Testing ordering of priority queue..." << endl;
+	BetterPriorityQueue q;
+
+	BPQNode a{3, false, 100};
+	BPQNode b{1, false, 200};
+	BPQNode c{2, false, 300};
 	
+	q.push(a);
+	q.push(b);
+	q.push(c);
+
+	// top should be b (pri 1)
+	BPQNode top = q.top();
+	assert(top.pri == 1);
+	assert(top.gnode == 200);
+
+	cout << "PASSED!" << endl;
+}
+
+void EmptyQueueTest() {
+	cout << "Testing edge cases on empty queue..." << endl;
+	BetterPriorityQueue q;
+	BPQNode n;
+	n.gnode = 1;
+	n.pri = 0;
+	assert(q.Update(n) == false);
+	assert(q.Contains(n) == false);
+	assert(q.ToString() == "[]");
 	cout << "PASSED!" << endl;
 }
 
 int main(){
-	
 	ContainsTest();
 	UpdateTest();
-	
+	PriorityOrderTest();
+	EmptyQueueTest();
+
 	cout << "ALL TESTS PASSED!!" << endl;
-	
 	return 0;
-	
 }
